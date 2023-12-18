@@ -12,7 +12,7 @@
       google.cloud.gcp_compute_instance_info:
         zone: us-central1-a
         filters:
-          - name = 
+          - name: '*' 
         project: totalplay
         auth_kind: serviceaccount
         # service_account_file: "totalplay-408405-183388a2eb3d.json"
