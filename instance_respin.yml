@@ -26,3 +26,40 @@
         #       | difference(desired_ instances))
         #       }}
         msg: "{{ gcp_instance_info.resources }}"
+
+    - name: Set Veeam API URL
+      set_fact:
+        veeam_api_url: "https://your-veeam-server/api/v1/jobs/{{ job_id }}/restore"
+
+    - name: Set Veeam API Authorization Header
+      set_fact:
+        veeam_api_headers:
+          Authorization: "Bearer <your_access_token>"
+          Content-Type: "application/json"
+
+    - name: Define Restore Request Payload
+      set_fact:
+        restore_request_payload: |
+          {
+            "restorePoint": "<restore_point_id>",
+            "targetResource": {
+              "type": "GoogleCloud",
+              "id": "<gcp_target_id>"
+            }
+          }
+
+    - name: Initiate Restore via Veeam API
+      uri:
+        url: "{{ veeam_api_url }}"
+        method: POST
+        headers: "{{ veeam_api_headers }}"
+        body_format: json
+        body: "{{ restore_request_payload }}"
+        status_code: 202  # Replace with the expected status code for a successful request
+        validate_certs: no  # Set to yes if you want to validate SSL certificates
+      register: restore_result
+
+    - name: Display Restore Result
+      debug:
+        var: restore_result
+
