@@ -19,7 +19,7 @@
               | map(attribute='name')
               }}
 
-    # - name: Get all registered VMs from Veem
+    # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
     #     url: "https://123.123.123.123:13140/api/v1/vmInstances?filter=string&orderby=string&offset=0&limit=0"
     #     method: GET
