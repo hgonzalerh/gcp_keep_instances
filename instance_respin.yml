@@ -1,18 +1,40 @@
-- hosts: localhost
+- name: Maintain Gcloud infra
+  hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: get info on an instance
+    - name: Get info on an instance
       google.cloud.gcp_compute_instance_info:
         zone: us-central1-a
+        # filters:
+        #   - name = '*'
         project: totalplay-408405
       register: gcp_instance_info
 
-    - name: Show existing instances
+    - name: Show missing instances
       ansible.builtin.debug:
         msg: >-
               {{
               gcp_instance_info.resources
               | map(attribute='name')
               }}
-      
+
+    # - name: Get all registered VMs from Veem
+    #   ansible.builtin.uri:
+    #     url: "https://123.123.123.123:13140/api/v1/vmInstances?filter=string&orderby=string&offset=0&limit=0"
+    #     method: GET
+    #     headers:
+    #       Authorization: "YOUR_API_KEY_HERE"
+    #       x-api-version: "1.2-rev0"
+    #     return_content: true
+    #     status_code: 200
+    #     validate_certs: false
+    #   register: veem_result
+
+    # - name: Show veem instances
+    #   ansible.builtin.debug:
+    #     msg: >-
+    #           {{
+    #           veem_result.data
+    #           | map(attribute='name')
+    #           }}
