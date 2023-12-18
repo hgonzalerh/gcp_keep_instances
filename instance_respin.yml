@@ -12,6 +12,8 @@
       google.cloud.gcp_compute_instance_info:
         zone: us-central1-a
         project: totalplay
+        filters:
+          - 'name = *'
         #auth_kind: serviceaccount
         # service_account_file: "totalplay-408405-183388a2eb3d.json"
       register: gcp_instance_info
