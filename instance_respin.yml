@@ -8,7 +8,7 @@
         zone: us-central1-a
         # filters:
         #   - name = '*'
-        project: totalplay-408405
+        project: qa-itsm-cloud
       register: gcp_instance_info
 
     - name: Show missing instances
