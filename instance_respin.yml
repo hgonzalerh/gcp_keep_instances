@@ -38,7 +38,7 @@
 
     - name: Display veeam login result
       ansible.builtin.debug:
-        var: veeam_login
+        var: veeam_login.json.access_token
 
     # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
