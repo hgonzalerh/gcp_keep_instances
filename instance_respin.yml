@@ -1,14 +1,16 @@
 - name: Maintain Gcloud infra
   hosts: localhost
   gather_facts: false
+  vars:
+    # gcp_project: 
+    # gcp_project: 
+    # veeam_password: 
 
   tasks:
     - name: Get info on an instance
       google.cloud.gcp_compute_instance_info:
         zone: us-central1-a
-        # filters:
-        #   - name = '*'
-        project: qa-itsm-cloud
+        project: "{{ gcp_project }}"
       register: gcp_instance_info
 
     - name: Show missing instances
@@ -18,6 +20,24 @@
               gcp_instance_info.resources
               | map(attribute='name')
               }}
+
+    - name: Get an Auth token from VEEAM backup
+      ansible.builtin.uri:
+        url: "https://{{ veeam_appliance_ip_port }}/api/v1/token"
+        method: POST
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+          x-api-version: "1.3-rev0"
+        body:
+          grant_type: "password"
+          username: "{{ veeam_username }}"
+          password: "{{ veeam_password }}"
+        body_format: form-urlencoded
+      register: veeam_login
+
+    - name: Display veeam login result
+      ansible.builtin.debug:
+        var: veeam_login
 
     # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
