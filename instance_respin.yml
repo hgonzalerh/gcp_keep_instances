@@ -58,9 +58,9 @@
       ansible.builtin.debug:
         msg: >-
           {{ 
-          ( veeam_instances.json.data | map(attribute='name')) 
-          | difference(
-          ((gcp_instance_info.resources | map(attribute='name')))
+          ( veeam_instances.json.data | map(attribute='name') ) 
+          | union(
+          ( gcp_instance_info.resources | map(attribute='name') )
           )
           }}
 
