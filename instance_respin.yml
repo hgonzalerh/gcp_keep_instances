@@ -33,6 +33,7 @@
           username: "{{ veeam_username }}"
           password: "{{ veeam_password }}"
         body_format: form-urlencoded
+        validate_certs: false
       register: veeam_login
 
     - name: Display veeam login result
