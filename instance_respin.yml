@@ -54,6 +54,15 @@
       ansible.builtin.debug:
         msg: "{{ veeam_instances.json.data | map(attribute='name') }}"
 
+    - name: Print machines to RESTORE
+      ansible.builtin.debug:
+        msg: >-
+          {{ 
+          ( veeam_instances.json.data | map(attribute='name')) 
+          | difference(
+          ((gcp_instance_info.resources | map(attribute='name')))
+          )
+          }}
 
 
     # - name: Get all registered VMs from Veeam
