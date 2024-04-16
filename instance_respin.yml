@@ -52,7 +52,7 @@
 
     - name: Print instances as known by VEEAM
       ansible.builtin.debug:
-        var: veeam_instances
+        msg: "{{ veeam_instances.json.data | selectattr('name') }}"
 
 
 
