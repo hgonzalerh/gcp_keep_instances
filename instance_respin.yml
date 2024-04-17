@@ -64,6 +64,12 @@
           )
           }}
 
+    # the ID for a machine name
+    # Get all restore points for all names and filter to a single name:
+    # Find the latest restore points
+    # Perfom machine restore using the latest snapshot
+
+
 
     # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
