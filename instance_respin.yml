@@ -69,7 +69,13 @@
     # Find the latest restore points
     # Perfom machine restore using the latest snapshot
 
+    - name: Print instances as known by VEEAM (full data)
+      ansible.builtin.debug:
+        msg: "{{ veeam_instances.json.data }}"
 
+    - name: Select one machine by name (use ansible-dum-cen-prbs)
+      ansible.builtin.debug:
+        msg: "{{ veeam_instances.json.data | selectattr('name','equalto','ansible-dum-cen-prbs') }}"
 
     # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
