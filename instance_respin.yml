@@ -64,8 +64,8 @@
           )
           }}
 
-    # the ID for a machine name
-    # Get all restore points for all names and filter to a single name:
+    # get the ID for a machine name
+    # Get all restore points for all names and filter to a single ID:
     # Find the latest restore points
     # Perfom machine restore using the latest snapshot
 
