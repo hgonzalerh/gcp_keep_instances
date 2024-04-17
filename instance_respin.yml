@@ -79,7 +79,7 @@
 
     - name: Get all restore points for a single machine id  7603165133034585515
       ansible.builtin.uri:
-        url: "https://{{ veeam_appliance_ip_port }}/vmInstance/restorePoints"
+        url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/7603165133034585515/restorePoints"
         method: GET
         headers:
           x-api-version: "1.3-rev0"
