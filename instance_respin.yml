@@ -59,7 +59,7 @@
         msg: >-
           {{ 
           ( veeam_instances.json.data | map(attribute='name') ) 
-          | union(
+          | difference(
           ( gcp_instance_info.resources | map(attribute='name') )
           )
           }}
