@@ -88,31 +88,27 @@
       register: veeam_restorepoints
 
     - name: Show all restorepoint snapshots for machine id 7603165133034585515
-      ansible.builtin.debug:
-        msg: >-
+      ansible.builtin.set_fact:
+        last_snapshot: >-
           {{ veeam_restorepoints.json.data |
           selectattr('type', 'equalto', 'Snapshot') |
-          selectattr('vmInstanceId','equalto','7603165133034585515') |
+          selectattr('vmInstanceId', 'equalto', '7603165133034585515') |
           sort(attribute='creationTimeUtc') |
           last
           }}
 
-    # - name: Get all registered VMs from Veeam
-    #   ansible.builtin.uri:
-    #     url: "https://123.123.123.123:13140/api/v1/vmInstances?filter=string&orderby=string&offset=0&limit=0"
-    #     method: GET
-    #     headers:
-    #       Authorization: "YOUR_API_KEY_HERE"
-    #       x-api-version: "1.2-rev0"
-    #     return_content: true
-    #     status_code: 200
-    #     validate_certs: false
-    #   register: veem_result
-
-    # - name: Show veem instances
-    #   ansible.builtin.debug:
-    #     msg: >-
-    #           {{
-    #           veem_result.data
-    #           | map(attribute='name')
-    #           }}
+    - name: Do a test restore of the latest restorepoint into machine id 7603165133034585515
+      ansible.builtin.uri:
+        url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints/{{ last_snapshot.id }}/restoreInstance"
+        method: POST
+        headers:
+          x-api-version: "1.3-rev0"
+          Authorization: "Bearer {{ veeam_access_token }}"
+          # Content-Type: application/json
+        body_format: json
+        body:
+          projectId: qa-itsm-cloud
+          serviceAccountId: "110145443605909653956"
+          restoreToOriginal: true
+        validate_certs: false
+      register: veeam_restorepoints
