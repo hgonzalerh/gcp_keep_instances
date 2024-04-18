@@ -92,9 +92,9 @@
         msg: >-
           {{ veeam_restorepoints.json.data |
           selectattr('type', 'equalto', 'Snapshot') |
-          selectattr('vmInstanceId','equalto','7603165133034585515')
+          selectattr('vmInstanceId','equalto','7603165133034585515') |
+          sort(attribute='creationTimeUtc')
           }}
-          # sort(attribute='creationTimeUtc')
 
     # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
