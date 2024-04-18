@@ -106,9 +106,12 @@
           Authorization: "Bearer {{ veeam_access_token }}"
           # Content-Type: application/json
         body_format: json
-        body:
-          projectId: qa-itsm-cloud
-          serviceAccountId: "110145443605909653956"
-          restoreToOriginal: true
+        body: >-
+          {
+          "projectId": "qa-itsm-cloud"
+          "serviceAccountId": "110145443605909653956"
+          "restoreToOriginal": true
+          }
+        
         validate_certs: false
       register: veeam_restorepoints
