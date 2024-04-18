@@ -124,5 +124,6 @@
           projectId: "qa-itsm-cloud"
           serviceAccountId: "{{ veeam_serviceaccounts.json.data[0].id }}"
           restoreToOriginal: true
+          instanceName: restoretest
         validate_certs: false
       register: veeam_restorepoints
