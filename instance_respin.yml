@@ -122,7 +122,7 @@
         body_format: json
         body:
           projectId: "qa-itsm-cloud"
-          serviceAccountId: 3178d696973e45391960e8bd637faf1ab7b7ce9e
+          serviceAccountId: "{{ veeam_serviceaccounts.json.data[0].id }}"
           restoreToOriginal: true
         validate_certs: false
       register: veeam_restorepoints
