@@ -57,10 +57,10 @@
     - name: Print machines to RESTORE
       ansible.builtin.debug:
         msg: >-
-          {{ 
-          ( veeam_instances.json.data | map(attribute='name') ) 
+          {{
+          (veeam_instances.json.data | map(attribute='name'))
           | difference(
-          ( gcp_instance_info.resources | map(attribute='name') )
+          (gcp_instance_info.resources | map(attribute='name'))
           )
           }}
 
@@ -75,7 +75,7 @@
 
     - name: Select one machine by name (use ansible-dum-cen-prbs)
       ansible.builtin.debug:
-        msg: "{{ veeam_instances.json.data | selectattr('name','equalto','ansible-dum-cen-prbs') }}"
+        msg: "{{ veeam_instances.json.data | selectattr('name', 'equalto', 'ansible-dum-cen-prbs') }}"
 
     - name: Get all restore points for everybody
       ansible.builtin.uri:
@@ -87,9 +87,14 @@
         validate_certs: false
       register: veeam_restorepoints
 
-    - name: Print restorepoints
+    - name: Show all restorepoint snapshots for machine id 7603165133034585515
       ansible.builtin.debug:
-        var: veeam_restorepoints
+        msg: >-
+          {{ veeam_restorepoints.json.data |
+          selectattr('type', 'equalto', 'Snapshot') |
+          selectattr('id','equalto','7603165133034585515') |
+          sort(attribute='creationTimeUtc')
+          }}
 
     # - name: Get all registered VMs from Veeam
     #   ansible.builtin.uri:
