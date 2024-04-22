@@ -5,15 +5,18 @@
     # gcp_project: 
     # gcp_project: 
     # veeam_password: 
+  module_defaults:
+    ansible.builtin.uri:
+      validate_certs: false
 
   tasks:
-    - name: Get info on an instance
+    - name: Get info on running instances
       google.cloud.gcp_compute_instance_info:
         zone: us-central1-a
         project: "{{ gcp_project }}"
       register: gcp_instance_info
 
-    - name: Show missing instances
+    - name: Show running instances
       ansible.builtin.debug:
         msg: >-
               {{
@@ -21,7 +24,7 @@
               | map(attribute='name')
               }}
 
-    - name: Get an Auth token from VEEAM backup
+    - name: Log on and get an Auth token from VEEAM backup
       ansible.builtin.uri:
         url: "https://{{ veeam_appliance_ip_port }}/api/v1/token"
         method: POST
@@ -40,7 +43,7 @@
       ansible.builtin.set_fact:
         veeam_access_token: "{{ veeam_login.json.access_token }}"
 
-    - name: Get all instances manage by VEEAM
+    - name: Get all instances managed by VEEAM
       ansible.builtin.uri:
         url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstances"
         method: GET
@@ -50,11 +53,11 @@
         validate_certs: false
       register: veeam_instances
 
-    - name: Print instances as known by VEEAM
+    - name: Print instances as known by VEEAM (names only)
       ansible.builtin.debug:
         msg: "{{ veeam_instances.json.data | map(attribute='name') }}"
 
-    - name: Print machines to RESTORE
+    - name: Print machines to RESTORE (list difference)
       ansible.builtin.debug:
         msg: >-
           {{
@@ -64,20 +67,15 @@
           )
           }}
 
-    # get the ID for a machine name
-    # Get all restore points for all names and filter to a single ID:
-    # Find the latest restore points
-    # Perfom machine restore using the latest snapshot
-
     - name: Print instances as known by VEEAM (full data)
       ansible.builtin.debug:
         msg: "{{ veeam_instances.json.data }}"
 
-    - name: Select one machine by name (use ansible-dum-cen-prbs)
+    - name: Print all info about one instance (use ansible-dum-cen-prbs)
       ansible.builtin.debug:
         msg: "{{ veeam_instances.json.data | selectattr('name', 'equalto', 'ansible-dum-cen-prbs') }}"
 
-    - name: Get all restore points for everybody
+    - name: Get all restore points for every instance backed up by VEEAM
       ansible.builtin.uri:
         url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints"
         method: GET
@@ -87,7 +85,7 @@
         validate_certs: false
       register: veeam_restorepoints
 
-    - name: Show all restorepoint snapshots for machine id 7603165133034585515
+    - name: Get latest restorepoint for machine id corresponding to ansible-dum-cen-prbs
       ansible.builtin.set_fact:
         last_snapshot: >-
           {{ veeam_restorepoints.json.data |
@@ -122,8 +120,9 @@
         body_format: json
         body:
           projectId: "qa-itsm-cloud"
+          # Use first service account that was found
           serviceAccountId: "{{ veeam_serviceaccounts.json.data[0].id }}"
+          # INTO ORIGINAL LOCATION
           restoreToOriginal: true
-          instanceName: restoretest
         validate_certs: false
       register: veeam_restorepoints
