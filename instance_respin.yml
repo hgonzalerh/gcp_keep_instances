@@ -123,8 +123,6 @@
           # Use first service account that was found
           serviceAccountId: "{{ veeam_serviceaccounts.json.data[0].id }}"
           # INTO ORIGINAL LOCATION
-          restoreToOriginal: true
           instanceName: ansible-dum-cen-prbs
-          startInstance: true
         validate_certs: false
       register: veeam_restorepoints
