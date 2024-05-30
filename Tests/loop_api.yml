@@ -1,0 +1,16 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Get all results from a loop
+      ansible.builtin.command:
+        cmd: echo {{ item }}
+      loop:
+        - unresultado
+        - dosresultados
+      register: loop_register
+
+    - ansible.builtin.debug:
+        msg: >
+          {{ loop_register.results
+            | map(attribute="stdout")
+          }}
