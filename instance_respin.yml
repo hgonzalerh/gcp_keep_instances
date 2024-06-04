@@ -16,7 +16,7 @@
         project: "{{ gcp_project }}"
       register: gcp_instance_info
 
-    - name: Show running instances
+    - name: Show running instances by name
       ansible.builtin.debug:
         msg: >-
               {{
@@ -24,6 +24,15 @@
               | map(attribute='name')
               }}
 
+    - name: Show running instances by ID
+      ansible.builtin.debug:
+        msg: >-
+              {{
+              gcp_instance_info.resources
+              | map(attribute='name')
+              }}
+
+              
     - name: Log on and get an Auth token from VEEAM backup
       ansible.builtin.uri:
         url: "https://{{ veeam_appliance_ip_port }}/api/v1/token"
