@@ -129,11 +129,14 @@
     - name: Get latest restorepoints for each vmid
       ansible.builtin.set_fact:
         last_snapshot: >-
-          {{ veeam_restorepoints.json.data |
+          {{ (last_snapshot | default([])) + 
+          [
+          veeam_restorepoints.json.data | 
           selectattr('type', 'equalto', 'Snapshot') |
           selectattr('vmInstanceId', 'equalto', item) |
           sort(attribute='creationTimeUtc') |
-          last
+          last 
+          ]
           }}
       loop: "{{ restore_vmid_list }}"
 
