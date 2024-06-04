@@ -113,8 +113,8 @@
       ansible.builtin.debug:
         msg: >-
           {{
-          ( gcp_instance_info.resources | map(attribute='id'))
-          | difference((gcp_instance_info.resources | map(attribute='vmInstanceId')))
+          ( gcp_instance_info.resources | map(attribute='vmInstanceId'))
+          | difference((gcp_instance_info.resources | map(attribute='id')))
           }}            
 
     # - name: Get latest restorepoint for machine id corresponding to ansible-dum-cen-prbs
