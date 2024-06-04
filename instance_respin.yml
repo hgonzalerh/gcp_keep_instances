@@ -128,8 +128,8 @@
 
     - name: Get latest restorepoints for each vmid
       ansible.builtin.set_fact:
-        last_snapshot: >-
-          {{ (last_snapshot | default([])) + 
+        latest_snapshots: >-
+          {{ (latest_snapshots | default([])) + 
           [
           veeam_restorepoints.json.data | 
           selectattr('type', 'equalto', 'Snapshot') |
@@ -140,6 +140,10 @@
           }}
       loop: "{{ restore_vmid_list }}"
 
+    - name: Show snapshots to restore
+      ansible.builtin.debug:
+        var: latest_snapshots
+        verbosity: 2 
 
     # - name: Get Veeam Service Account that's needed for operating
     #   ansible.builtin.uri:
