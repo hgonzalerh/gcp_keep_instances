@@ -74,6 +74,13 @@
           Authorization: "Bearer {{ veeam_access_token }}"
         validate_certs: false
       register: veeam_restorepoints
+    
+    - name: Sholl all backup information
+      ansible.builtin.debug:
+        msg: >-
+              {{
+              veeam_restorepoints.json.data
+              }}
 
     - name: Show all vm IDs that have a backup
       ansible.builtin.debug:
@@ -84,23 +91,23 @@
               | unique
               }}
 
-    - name: Obtain a list of all vm NAMES that have a backup
-      ansible.builtin.uri:
-        url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstances/{{ item }}"
-        method: GET
-        headers:
-          x-api-version: "1.3-rev0"
-          Authorization: "Bearer {{ veeam_access_token }}"
-        validate_certs: false
-      loop: "{{ veeam_restorepoints.json.data | map(attribute='vmInstanceId') | unique }}"
-      register: known_machines_rest_results
+    # - name: Obtain a list of all vm NAMES that have a backup
+    #   ansible.builtin.uri:
+    #     url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstances/{{ item }}"
+    #     method: GET
+    #     headers:
+    #       x-api-version: "1.3-rev0"
+    #       Authorization: "Bearer {{ veeam_access_token }}"
+    #     validate_certs: false
+    #   loop: "{{ veeam_restorepoints.json.data | map(attribute='vmInstanceId') | unique }}"
+    #   register: known_machines_rest_results
         
-    - name: Show all vm NAMES that have a backup
-      ansible.builtin.debug:
-        msg: >-
-          {{ known_machines_rest_results.results
-            | map(attribute="name")
-          }}
+    # - name: Show all vm NAMES that have a backup
+    #   ansible.builtin.debug:
+    #     msg: >-
+    #       {{ known_machines_rest_results.results
+    #         | map(attribute="name")
+    #       }}
 
     - name: Print machines to RESTORE (list difference)
       ansible.builtin.debug:
