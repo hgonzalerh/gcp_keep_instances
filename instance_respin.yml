@@ -29,7 +29,7 @@
         msg: >-
               {{
               gcp_instance_info.resources
-              | map(attribute='name')
+              | map(attribute='id')
               }}
 
               
