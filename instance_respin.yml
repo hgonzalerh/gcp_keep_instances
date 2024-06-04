@@ -28,7 +28,7 @@
               {{
               gcp_instance_info.resources
               | map(attribute='metadata.items')
-              | selectattr('key','OriginalId)
+              | selectattr('key','OriginalId')
               }}
               
     - name: Fail for debugging
