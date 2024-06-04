@@ -27,8 +27,11 @@
         msg: >-
               {{
               gcp_instance_info.resources
-              | map(attribute='id')
+              | map(attribute='metadata.items')
               }}
+              
+    - name: Fail for debugging
+      ansible.builtin.fail:
 
     - name: Log on and get an Auth token from VEEAM backup
       ansible.builtin.uri:
