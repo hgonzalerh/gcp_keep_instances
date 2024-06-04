@@ -127,7 +127,7 @@
         verbosity: 2   
 
     - name: Get latest restorepoints for each vmid
-      ansible.builtin.set_fact:
+      ansible.builtin.set_facts:
         last_snapshot: >-
           {{ veeam_restorepoints.json.data |
           selectattr('type', 'equalto', 'Snapshot') |
