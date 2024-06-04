@@ -1,10 +1,7 @@
-- name: Maintain Gcloud infra
+- name: Restore deleted VMs from VEEAM
   hosts: localhost
   gather_facts: false
-  vars:
-    # gcp_project: 
-    # gcp_project: 
-    # veeam_password: 
+
   module_defaults:
     ansible.builtin.uri:
       validate_certs: false
@@ -69,10 +66,7 @@
     - name: Print instances active on VEEAM (full data)
       ansible.builtin.debug:
         msg: "{{ veeam_instances.json.data }}"
-
-    - name: Print all info about one instance (use ansible-dum-cen-prbs)
-      ansible.builtin.debug:
-        msg: "{{ veeam_instances.json.data | selectattr('name', 'equalto', 'ansible-dum-cen-prbs') }}"
+        verbosity: 2
 
     - name: Get all restore points for every instance backed up by VEEAM
       ansible.builtin.uri:
@@ -84,14 +78,15 @@
         validate_certs: false
       register: veeam_restorepoints
     
-    - name: Sholl all backup information
+    - name: Show information about all restore points
       ansible.builtin.debug:
         msg: >-
               {{
               veeam_restorepoints.json.data
               }}
+        verbosity: 2
 
-    - name: Show all vm IDs that have a backup
+    - name: Show all vmids that have a backup
       ansible.builtin.debug:
         msg: >-
               {{
@@ -118,23 +113,30 @@
     #         | map(attribute="name")
     #       }}
 
-    - name: Print machines to RESTORE (list difference)
-      ansible.builtin.debug:
-        msg: >-
+    - name: Calculate machines to RESTORE (list difference)
+      ansible.builtin.set_facts:
+        restore_vmid_list: >-
           {{
           ( veeam_restorepoints.json.data | map(attribute='vmInstanceId'))
           | difference(gcp_instance_info.resources | map(attribute='id'))
           }}
 
-    # - name: Get latest restorepoint for machine id corresponding to ansible-dum-cen-prbs
-    #   ansible.builtin.set_fact:
-    #     last_snapshot: >-
-    #       {{ veeam_restorepoints.json.data |
-    #       selectattr('type', 'equalto', 'Snapshot') |
-    #       selectattr('vmInstanceId', 'equalto', '7603165133034585515') |
-    #       sort(attribute='creationTimeUtc') |
-    #       last
-    #       }}
+    - name: Show restore vmid list
+      ansible.builtin.debug:
+        var: restore_vmid_list
+        verbosity: 2   
+
+    - name: Get latest restorepoints for each vmid
+      ansible.builtin.set_fact:
+        last_snapshot: >-
+          {{ veeam_restorepoints.json.data |
+          selectattr('type', 'equalto', 'Snapshot') |
+          selectattr('vmInstanceId', 'equalto', item) |
+          sort(attribute='creationTimeUtc') |
+          last
+          }}
+      loop: "{{ restore_vmid_list }}"
+
 
     # - name: Get Veeam Service Account that's needed for operating
     #   ansible.builtin.uri:
