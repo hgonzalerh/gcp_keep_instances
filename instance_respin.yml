@@ -113,7 +113,7 @@
       ansible.builtin.debug:
         msg: >-
           {{
-          (known_machines_rest_results.results | map(attribute='id'))
+          ( gcp_instance_info.resources | map(attribute='id'))
           | difference((gcp_instance_info.resources | map(attribute='vmInstanceId')))
           }}            
 
