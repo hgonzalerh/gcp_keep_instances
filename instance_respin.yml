@@ -114,7 +114,7 @@
     #       }}
 
     - name: Calculate machines to RESTORE (list difference)
-      ansible.builtin.set_facts:
+      ansible.builtin.set_fact:
         restore_vmid_list: >-
           {{
           ( veeam_restorepoints.json.data | map(attribute='vmInstanceId'))
@@ -127,7 +127,7 @@
         verbosity: 2   
 
     - name: Get latest restorepoints for each vmid
-      ansible.builtin.set_facts:
+      ansible.builtin.set_fact:
         last_snapshot: >-
           {{ veeam_restorepoints.json.data |
           selectattr('type', 'equalto', 'Snapshot') |
