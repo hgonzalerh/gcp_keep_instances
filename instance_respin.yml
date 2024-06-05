@@ -27,7 +27,7 @@
         msg: >-
               {{
               gcp_instance_info.resources
-              | map(attribute='metadata.items') |flatten
+              | map(attribute='metadata.items') |flatten | selectattr('key','equalto','OriginalId') | list
               }}
               
     - name: Fail for debugging
