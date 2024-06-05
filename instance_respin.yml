@@ -65,7 +65,7 @@
       register: veeam_login
 
     - name: Save veeam login result
-      ansible.builtin.set_facts:
+      ansible.builtin.set_fact:
         veeam_access_token: "{{ veeam_login.json.access_token }}"
 
     - name: Get all instances active on VEEAM
