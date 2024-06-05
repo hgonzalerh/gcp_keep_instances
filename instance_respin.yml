@@ -109,6 +109,7 @@
         msg: >-
               {{
               veeam_restorepoints.json.data
+              | selectattr('type', 'equalto', 'Snapshot')
               | map(attribute='vmInstanceId')
               | unique
               }}
