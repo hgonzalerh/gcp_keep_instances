@@ -129,9 +129,6 @@
     #       | difference(gcp_instance_info.resources | map(attribute='id'))
     #       }}
 
-    - name: Fail by design
-      ansible.builtin.fail:
-      
     - name: Show restore vmid list
       ansible.builtin.debug:
         var: restore_vmid_list
