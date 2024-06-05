@@ -39,7 +39,7 @@
               }}
 
     - name: Add new and old ids
-      ansible.builtin.set_facts:
+      ansible.builtin.set_fact:
         total_running_ids: >-
               {{
               (gcp_instance_info.resources
