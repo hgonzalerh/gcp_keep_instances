@@ -21,6 +21,14 @@
               gcp_instance_info.resources
               | map(attribute='name')
               }}
+              
+    - name: Show running instances by id
+      ansible.builtin.debug:
+        msg: >-
+              {{
+              gcp_instance_info.resources
+              | map(attribute='id')
+              }}
 
     - name: Show running instances by *OriginalId*
       ansible.builtin.debug:
@@ -29,7 +37,16 @@
               gcp_instance_info.resources
               | map(attribute='metadata.items') |flatten | selectattr('key','equalto','OriginalId') | list
               }}
-              
+
+    - name: Add new and old ids
+      ansible.builtin.set_facts:
+        total_running_ids: >-
+              {{
+              (gcp_instance_info.resources
+              | map(attribute='metadata.items') |flatten | selectattr('key','equalto','OriginalId') | list ) +
+              (gcp_instance_info.resources
+              | map(attribute='id') | list )
+              }}
     # - name: Fail for debugging
     #   ansible.builtin.fail:
 
@@ -101,9 +118,16 @@
         restore_vmid_list: >-
           {{
           ( veeam_restorepoints.json.data | map(attribute='vmInstanceId'))
-          | difference(gcp_instance_info.resources | map(attribute='id'))
+          | difference(total_running_ids))
           }}
 
+    # - name: Calculate machines to RESTORE (list difference)
+    #   ansible.builtin.set_fact:
+    #     restore_vmid_list: >-
+    #       {{
+    #       ( veeam_restorepoints.json.data | map(attribute='vmInstanceId'))
+    #       | difference(gcp_instance_info.resources | map(attribute='id'))
+    #       }}
 
     - name: Fail by design
       ansible.builtin.fail:
