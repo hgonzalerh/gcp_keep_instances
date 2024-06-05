@@ -117,8 +117,8 @@
       ansible.builtin.set_fact:
         restore_vmid_list: >-
           {{
-          ( veeam_restorepoints.json.data | map(attribute='vmInstanceId'))
-          | difference(total_running_ids))
+          ( veeam_restorepoints.json.data | map(attribute='vmInstanceId') | unique)
+          | difference(total_running_ids)
           }}
 
     # - name: Calculate machines to RESTORE (list difference)
