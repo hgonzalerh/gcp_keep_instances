@@ -139,11 +139,10 @@
         latest_snapshots: >-
           {{ (latest_snapshots | default([])) + 
           [
-          veeam_restorepoints.json.data | 
+          (veeam_restorepoints.json.data | 
           selectattr('type', 'equalto', 'Snapshot') |
           selectattr('vmInstanceId', 'equalto', item) |
-          sort(attribute='creationTimeUtc') |
-          last 
+          sort(attribute='creationTimeUtc'))[-1] | default([])
           ]
           }}
       loop: "{{ restore_vmid_list }}"
@@ -183,3 +182,7 @@
           # INTO ORIGINAL LOCATION
           restoreToOriginal: true
       loop: "{{ latest_snapshots | default([]) }}"
+      tags:
+        - never
+        - restore
+        
