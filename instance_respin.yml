@@ -182,4 +182,4 @@
           serviceAccountId: "{{ veeam_serviceaccounts.json.data[0].id }}"
           # INTO ORIGINAL LOCATION
           restoreToOriginal: true
-      loop: "{{ latest_snapshots }}"
+      loop: "{{ latest_snapshots | default([]) }}"
