@@ -139,12 +139,12 @@
       ansible.builtin.set_fact:
         latest_snapshots: >-
           {{ (latest_snapshots | default([])) + 
-          [
+          ([
           (veeam_restorepoints.json.data | 
           selectattr('type', 'equalto', 'Snapshot') |
           selectattr('vmInstanceId', 'equalto', item) |
-          sort(attribute='creationTimeUtc'))[-1] | default([])
-          ]
+          sort(attribute='creationTimeUtc'))[-1] 
+          ] | default([]))
           }}
       loop: "{{ restore_vmid_list }}"
 
