@@ -104,17 +104,42 @@
               }}
         verbosity: 2
 
-    - name: Get the information of the vm protected by each restore point
+    # - name: Get the information of the vm protected by each restore point
+    #   ansible.builtin.uri:
+    #     url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints/{{ item }}/vmConfig"
+    #     method: GET
+    #     headers:
+    #       x-api-version: "1.3-rev0"
+    #       Authorization: "Bearer {{ veeam_access_token }}"
+    #   loop: "{{ veeam_restorepoints.json.data | map(attribute='id') }}"
+
+    # - name: Fail early
+    #   ansible.builtin.fail:
+
+    - name: Get all sessions
       ansible.builtin.uri:
-        url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints/{{ item }}/vmConfig"
+        url: "https://{{ veeam_appliance_ip_port }}/api/v1/sessions"
         method: GET
         headers:
           x-api-version: "1.3-rev0"
           Authorization: "Bearer {{ veeam_access_token }}"
-      loop: "{{ veeam_restorepoints.json.data | map(attribute='id') }}"
+      register: all_sessions
 
-    - name: Fail early
-      ansible.builtin.fail:
+    - name: Get all sessions data for backup sessions
+      ansible.builtin.uri:
+        url: "https://{{ veeam_appliance_ip_port }}/api/v1/sessions/{{ item }}/protectedItems"
+        method: GET
+        headers:
+          x-api-version: "1.3-rev0"
+          Authorization: "Bearer {{ veeam_access_token }}"
+      loop: "{{ all_sessions.json.data | selectattr('SessionType', 'equalto', 'BackupPolicy') | map(attribute='id') }}"
+      register: backupsessiondata
+
+    - name: Create a dictionary for id-hostname correspondenc
+      ansible.builtin.set_facts:
+        correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
+      loop: "{{ backupsessiondata.json.data }}"
+        
 
     - name: Show all vmids that have a backup
       ansible.builtin.debug:
