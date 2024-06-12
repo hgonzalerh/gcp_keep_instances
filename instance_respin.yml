@@ -137,7 +137,7 @@
     
     - name: Show running instances by name
       ansible.builtin.debug:
-        var: backupsessiondata
+        msg: "{{ backupsessiondata.results  | map(attribute='json.data') | flatten  }}"
 
     - name: Create a dictionary for id-hostname correspondenc
       ansible.builtin.set_fact:
