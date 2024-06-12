@@ -95,7 +95,7 @@
           x-api-version: "1.3-rev0"
           Authorization: "Bearer {{ veeam_access_token }}"
       register: veeam_restorepoints
-    
+      
     - name: Show information about all restore points
       ansible.builtin.debug:
         msg: >-
@@ -103,6 +103,18 @@
               veeam_restorepoints.json.data
               }}
         verbosity: 2
+
+    - name: Get the information of the vm protected by each restore point
+      ansible.builtin.uri:
+        url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints/{{ item }}/vmConfig"
+        method: GET
+        headers:
+          x-api-version: "1.3-rev0"
+          Authorization: "Bearer {{ veeam_access_token }}"
+      loop: "{{ veeam_restorepoints.json.data | selectattr('type', 'equalto', 'Snapshot') | map(attribute='id') }}"
+
+    - name: Fail early
+      ansible.builtin.fail:
 
     - name: Show all vmids that have a backup
       ansible.builtin.debug:
