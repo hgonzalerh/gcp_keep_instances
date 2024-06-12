@@ -136,7 +136,7 @@
       register: backupsessiondata
 
     - name: Create a dictionary for id-hostname correspondenc
-      ansible.builtin.set_facts:
+      ansible.builtin.set_fact:
         correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
       loop: "{{ backupsessiondata.json.data }}"
         
