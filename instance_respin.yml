@@ -143,7 +143,10 @@
       ansible.builtin.set_fact:
         correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
       loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
-        
+      
+    - name: Show running instances by name
+      ansible.builtin.debug:
+        var: correspondence
 
     - name: Show all vmids that have a backup
       ansible.builtin.debug:
