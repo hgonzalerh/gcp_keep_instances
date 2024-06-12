@@ -144,7 +144,7 @@
         correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
       loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
       
-    - name: Show running instances by name
+    - name: Show correspondence
       ansible.builtin.debug:
         var: correspondence
 
