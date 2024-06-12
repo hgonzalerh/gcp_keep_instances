@@ -134,6 +134,10 @@
           Authorization: "Bearer {{ veeam_access_token }}"
       loop: "{{ all_sessions.json.data | selectattr('sessionType', 'equalto', 'BackupPolicy') | map(attribute='id') }}"
       register: backupsessiondata
+    
+    - name: Show running instances by name
+      ansible.builtin.debug:
+        var: backupsessiondata
 
     - name: Create a dictionary for id-hostname correspondenc
       ansible.builtin.set_fact:
