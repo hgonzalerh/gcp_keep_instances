@@ -146,7 +146,7 @@
 
     - name: Create a list of all time backed up machines
       ansible.builtin.set_fact:
-        allvmbackups: "{{ (allvmbackups | default([])) + [item.name]  | unique }}"
+        allvmbackups: "{{ ((allvmbackups | default([])) + [item.name] ) | unique }}"
       loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
       
     - name: Show correspondence
