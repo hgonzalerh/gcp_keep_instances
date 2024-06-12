@@ -142,7 +142,7 @@
     - name: Create a dictionary for id-hostname correspondenc
       ansible.builtin.set_fact:
         correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
-      loop: "{{ backupsessiondata.json.data }}"
+      loop: "{{ backupsessiondata.results | map(attribute='json.data') }}"
         
 
     - name: Show all vmids that have a backup
