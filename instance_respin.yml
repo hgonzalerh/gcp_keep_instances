@@ -139,14 +139,19 @@
       ansible.builtin.debug:
         msg: "{{ backupsessiondata.results  | map(attribute='json.data') | flatten  }}"
 
-    - name: Create a dictionary for id-hostname correspondenc
+    # - name: Create a dictionary for id-hostname correspondenc
+    #   ansible.builtin.set_fact:
+    #     correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
+    #   loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
+
+    - name: Create a list of all time backed up machines
       ansible.builtin.set_fact:
-        correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
+        allvmbackups: "{{ (allvmbackups | default([])) + [item.name]  | unique }}"
       loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
       
     - name: Show correspondence
       ansible.builtin.debug:
-        var: correspondence
+        var: allvmbackups
 
     - name: Show all vmids that have a backup
       ansible.builtin.debug:
