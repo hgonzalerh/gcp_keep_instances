@@ -111,7 +111,7 @@
         headers:
           x-api-version: "1.3-rev0"
           Authorization: "Bearer {{ veeam_access_token }}"
-      loop: "{{ veeam_restorepoints.json.data | selectattr('type', 'equalto', 'Snapshot') | map(attribute='id') }}"
+      loop: "{{ veeam_restorepoints.json.data | map(attribute='id') }}"
 
     - name: Fail early
       ansible.builtin.fail:
