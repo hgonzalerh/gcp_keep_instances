@@ -115,18 +115,10 @@
           | difference(total_running_ids)
           }}
 
-    # - name: Calculate machines to RESTORE (list difference)
-    #   ansible.builtin.set_fact:
-    #     restore_vmid_list: >-
-    #       {{
-    #       ( veeam_restorepoints.json.data | map(attribute='vmInstanceId'))
-    #       | difference(gcp_instance_info.resources | map(attribute='id'))
-    #       }}
-
     - name: Show restore vmid list
       ansible.builtin.debug:
         var: restore_vmid_list
-        verbosity: 2   
+        verbosity: 2
 
     - name: Get latest restorepoints for each vmid
       ansible.builtin.set_fact:
@@ -140,11 +132,6 @@
           ] | default([]))
           }}
       loop: "{{ restore_vmid_list }}"
-
-    - name: Show snapshots to restore
-      ansible.builtin.debug:
-        var: latest_snapshots
-        verbosity: 2
 
     - name: Get Veeam Service Account needed for operating
       ansible.builtin.uri:
