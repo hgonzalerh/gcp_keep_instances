@@ -21,7 +21,7 @@
               gcp_instance_info.resources
               | map(attribute='name')
               }}
-              
+
     - name: Show running instances by id
       ansible.builtin.debug:
         msg: >-
@@ -47,8 +47,6 @@
               (gcp_instance_info.resources
               | map(attribute='id') | list )
               }}
-    # - name: Fail for debugging
-    #   ansible.builtin.fail:
 
     - name: Log on and get an Auth token from VEEAM backup
       ansible.builtin.uri:
@@ -82,11 +80,6 @@
       ansible.builtin.debug:
         msg: "{{ veeam_instances.json.data | map(attribute='id') }}"
 
-    # - name: Print instances active on VEEAM (full data)
-    #   ansible.builtin.debug:
-    #     msg: "{{ veeam_instances.json.data }}"
-    #     verbosity: 2
-
     - name: Get all restore points for every instance backed up by VEEAM
       ansible.builtin.uri:
         url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints"
@@ -95,7 +88,7 @@
           x-api-version: "1.3-rev0"
           Authorization: "Bearer {{ veeam_access_token }}"
       register: veeam_restorepoints
-      
+
     - name: Show information about all restore points
       ansible.builtin.debug:
         msg: >-
@@ -103,55 +96,6 @@
               veeam_restorepoints.json.data
               }}
         verbosity: 2
-
-    # - name: Get the information of the vm protected by each restore point
-    #   ansible.builtin.uri:
-    #     url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints/{{ item }}/vmConfig"
-    #     method: GET
-    #     headers:
-    #       x-api-version: "1.3-rev0"
-    #       Authorization: "Bearer {{ veeam_access_token }}"
-    #   loop: "{{ veeam_restorepoints.json.data | map(attribute='id') }}"
-
-    # - name: Fail early
-    #   ansible.builtin.fail:
-
-    - name: Get all sessions
-      ansible.builtin.uri:
-        url: "https://{{ veeam_appliance_ip_port }}/api/v1/sessions"
-        method: GET
-        headers:
-          x-api-version: "1.3-rev0"
-          Authorization: "Bearer {{ veeam_access_token }}"
-      register: all_sessions
-
-    - name: Get all sessions data for backup sessions
-      ansible.builtin.uri:
-        url: "https://{{ veeam_appliance_ip_port }}/api/v1/sessions/{{ item }}/protectedItems"
-        method: GET
-        headers:
-          x-api-version: "1.3-rev0"
-          Authorization: "Bearer {{ veeam_access_token }}"
-      loop: "{{ all_sessions.json.data | selectattr('sessionType', 'equalto', 'BackupPolicy') | map(attribute='id') }}"
-      register: backupsessiondata
-    
-    - name: Show running instances by name
-      ansible.builtin.debug:
-        msg: "{{ backupsessiondata.results  | map(attribute='json.data') | flatten  }}"
-
-    # - name: Create a dictionary for id-hostname correspondenc
-    #   ansible.builtin.set_fact:
-    #     correspondence: "{{ (correspondence | default({})) | combine({ item.id: item.name })}}"
-    #   loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
-
-    - name: Create a list of all time backed up machines
-      ansible.builtin.set_fact:
-        allvmbackups: "{{ ((allvmbackups | default([])) + [item.name] ) | unique }}"
-      loop: "{{ backupsessiondata.results | map(attribute='json.data') | flatten }}"
-      
-    - name: Show correspondence
-      ansible.builtin.debug:
-        var: allvmbackups
 
     - name: Show all vmids that have a backup
       ansible.builtin.debug:
@@ -200,7 +144,7 @@
     - name: Show snapshots to restore
       ansible.builtin.debug:
         var: latest_snapshots
-        verbosity: 2 
+        verbosity: 2
 
     - name: Get Veeam Service Account needed for operating
       ansible.builtin.uri:
@@ -216,6 +160,7 @@
         msg: "{{ veeam_serviceaccounts }}"
         verbosity: 2
 
+    # All redundant machines will fail to recreate
     - name: Do a restore of all missing vms using their latest restorepoint
       ansible.builtin.uri:
         url: "https://{{ veeam_appliance_ip_port }}/api/v1/vmInstance/restorePoints/{{ item.id }}/restoreInstance"
@@ -232,7 +177,6 @@
           # INTO ORIGINAL LOCATION
           restoreToOriginal: true
       loop: "{{ latest_snapshots | default([]) }}"
-      tags:
-        - never
-        - restore
-        
+      register: machine_restore
+      failed_when: false
+      changed_when: machine_restore is success
